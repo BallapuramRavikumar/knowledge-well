@@ -17,3 +17,16 @@ Thumbs.db
 
 # Env files
 .env
+
+# Vector databases / Chroma
+*.sqlite3
+*.db
+Vectorstore/
+chromadb/
+
+# Logs
+*.log
+
+# Build artifacts
+build/
+dist/
