@@ -30,3 +30,4 @@ chromadb/
 # Build artifacts
 build/
 dist/
+knowledge-well/Vectorstore/
