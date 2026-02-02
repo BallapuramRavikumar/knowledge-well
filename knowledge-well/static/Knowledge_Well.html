@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MTS Knowledge Well</title>
+  <style>
+    :root{
+      --bg: #f5f5f5;
+      --panel: #6666FF;
+      --panel-2: #75a8d3;
+      --text: #103b5b;
+      --muted: #6a8094;
+      --white: #fff;
+      --radius: 16px;
+      --radius-sm: 12px;
+
+      /* header palette */
+      --topbar-bg: #6666FF;     
+      --topbar-text:#ffffff;
+      --navbar-bg:#e6eef6;
+      --link:#0f4e78;
+      --link-hover:#1d6fa5;
+    }
+
+    *{ box-sizing:border-box }
+    html, body { height: 100% }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* ===== Topbar ===== */
+    .topbar{
+        background: var(--topbar-bg);
+        border-bottom: 1px solid rgba(0,0,0,.06);
+        /* position: sticky; top: 0; z-index: 1000;  <-- uncomment if you want sticky */
+    }
+    .topbar__inner{
+        display: grid;
+        grid-template-columns: 48px 1fr 36px;
+        gap: 12px;
+        align-items: center;
+        padding: 10px 0;
+        min-height: 82px;
+    }
+    .brand{ width: 42px; height:42px; object-fit: contain; }
+    .title{
+        margin:0; text-align:center; font-weight:800;
+        font-size: clamp(18px, 2.2vw, 28px);
+        color: var(--topbar-text);
+        letter-spacing:.5px;
+    }
+    .lang img{ width:28px; height:28px; opacity:.95; }
+
+    /* ===== Navbar (below topbar) ===== */
+    .navbar{
+        background: var(--navbar-bg);
+        box-shadow: 0 2px 4px rgba(0,0,0,.05);
+    }
+    .navbar__inner{
+        display:flex; gap:24px; align-items:center; padding: 0 16px;
+    }
+    .navbar__list{
+        display:flex; gap:24px; list-style:none; margin:0; padding:0;
+    }
+    .navbar__link{
+        display:block; padding:12px 0;
+        font-weight:600; font-size:16px;
+        color: var(--link); text-decoration:none;
+        border-bottom: 2px solid transparent;
+        transition: color .2s ease, border-color .2s ease;
+    }
+    .navbar__link:hover{ color: var(--link-hover); }
+    .navbar__link.active{ border-bottom-color: var(--primary-color); color: var(--link-hover); }
+
+    /* Responsive: stack links on small screens */
+    @media (max-width: 768px){
+        .topbar__inner{ grid-template-columns: 40px 1fr 32px; }
+        .navbar__inner{ flex-direction: column; align-items: stretch; }
+        .navbar__list{ flex-direction: column; gap: 10px; }
+        .navbar__link{ padding:10px 0; }
+    }
+
+    /* --- Shared width just for header & navbar --- */
+    .shell { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+
+    /* Give .container back to content only; header/nav will use .shell */
+    :root{
+      /* you reference this in .navbar__link.active; set it explicitly */
+      --primary-color: #2b5a7b;
+    }
+
+    /* Header + Navbar should not inherit content margins */
+    .topbar .shell,
+    .navbar .shell { margin: 0 auto; }
+
+    /* Optional: make the title size match your other project nicely */
+    .title{
+      font-size: clamp(18px, 2.2vw, 28px);
+    }
+
+    .container{ max-width: 980px; margin: 40px auto; padding: 0 16px; }
+
+    .app-title{ display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+    .logo{ width:40px; height:40px; border-radius:10px; background: linear-gradient(135deg, var(--panel), var(--panel-2)); box-shadow: 0 10px 24px rgba(102,102,255,.25); }
+    h1{ font-size: 1.6rem; margin:0; letter-spacing:.3px }
+    .muted{ color: var(--muted); font-size:.95rem }
+
+    .card{ background: var(--white); border-radius: var(--radius); box-shadow: 0 10px 30px rgba(16,59,91,.08); padding: 16px; }
+
+    label{ font-size:.9rem; color: var(--muted); display:block; margin-bottom:6px }
+
+    .textarea{
+      width:100%; border: 1px solid #d8e2ec; background: #f9fbfe; color: var(--text);
+      border-radius: var(--radius-sm); padding: 10px 12px; outline: none;
+      transition: box-shadow .15s ease, border-color .15s ease; min-height: 110px; resize: vertical;
+    }
+    .textarea:focus{ border-color: var(--panel-2); box-shadow: 0 0 0 3px rgba(117,168,211,.25) }
+
+    .btn{ cursor:pointer; border:none; border-radius: 999px; padding: 12px 18px; font-weight: 600; color: white;
+      background: linear-gradient(135deg, var(--panel), var(--panel-2)); box-shadow: 0 10px 22px rgba(102,102,255,.25);
+      display:inline-flex; align-items:center; gap:10px; }
+    .btn:disabled{ opacity:.6; cursor:not-allowed }
+
+    .btn-secondary{ background: #eff4fb; color: var(--text); border: 1px solid #d8e2ec; box-shadow:none; }
+
+    .toolbar{ display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; justify-content: space-between; }
+
+    .section{ margin-top: 18px }
+    .section h3{ margin:0 0 10px 0; font-size:1.05rem }
+
+    /* Lead intro pill */
+    .answer-lead{
+      background:#f7fbff;border:1px solid #e4edf6;border-radius:12px;
+      padding:12px 14px;margin-bottom:12px
+    }
+
+    /* Numbered item cards */
+    .answer-block{ display:grid; gap:12px }
+    .answer-card{
+      background:#fff;border:1px solid #e4edf6;border-radius:12px;
+      padding:12px 14px; box-shadow:0 4px 14px rgba(16,59,91,.05)
+    }
+    .answer-card h4{
+      margin:0 0 6px; color:var(--panel); font-size:1rem;
+      display:flex; align-items:center; gap:8px
+    }
+    .answer-card .idx{
+      display:inline-grid; place-items:center; width:24px; height:24px; border-radius:50%;
+      background:linear-gradient(135deg,var(--panel),var(--panel-2)); color:#fff; font-weight:700; font-size:.85rem
+    }
+    .answer-card p{ margin:0; color:var(--text) }
+
+    /* Small source chips pulled from [ ... ] */
+    .sources{ margin-top:8px; display:flex; gap:8px; flex-wrap:wrap }
+    .source{
+      font-size:.8rem; padding:4px 8px; border:1px dashed #cfe0ef;
+      border-radius:999px; background:#f6fbff; color:var(--muted)
+    }
+
+    /* Solutions block */
+    .solutions-card{ background:#fff;border:1px solid #e4edf6;border-radius:12px; padding:12px 14px; box-shadow:0 4px 14px rgba(16,59,91,.05) }
+    .solutions-card h4{ margin:0 0 6px; color:var(--panel) }
+    .solutions-list{ margin:6px 0 0; padding-left:20px }
+    .solutions-list li{ margin:6px 0 }
+
+    /* Graph summary – readable cards */
+    .graph-grid{ display:grid; grid-template-columns: 1fr; gap:12px }
+    @media (min-width: 900px){ .graph-grid{ grid-template-columns: 1fr 1fr } }
+
+    .gcard{
+      background:#fff; border:1px solid #e4edf6; border-radius:12px; padding:12px 14px;
+      box-shadow:0 4px 14px rgba(16,59,91,.05); overflow:hidden;
+      word-break: break-word; overflow-wrap: anywhere;   /* ⟵ prevent long-token overlap */
+    }
+    .gcard *{ word-break: break-word; overflow-wrap: anywhere }
+
+    .meta{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px }
+    .kbadge,.pbadge{ font-size:.8rem; padding:4px 8px; border-radius:999px; background:#eef6ff; border:1px solid #d8e2ec; color:var(--text) }
+    .pbadge{ background:#f6fbff }
+
+    .abstr{ margin:0; padding-left:18px }
+    .abstr li{ margin:6px 0 }
+
+    .more{ margin-top:8px; font-size:.9rem }
+
+    details{ border:1px dashed #d8e2ec; border-radius: var(--radius-sm); background:#fbfdff; }
+    details > summary{ cursor:pointer; padding:8px 12px; color: var(--muted) }
+    details .content{ padding: 0 12px 12px 12px }
+
+    .tags{ display:flex; gap:8px; flex-wrap:wrap }
+    .tag{ padding:4px 10px; border-radius: 999px; background:#eef6ff; border:1px solid #d8e2ec; color: var(--text); font-size:.85rem }
+    .tag.alt{ background:#f2f7fb }
+
+    .docs-grid{ display:grid; grid-template-columns: 1fr; gap:10px }
+    @media (min-width: 780px){ .docs-grid{ grid-template-columns: 1fr 1fr } }
+    .doc{ border:1px solid #e4edf6; border-radius: var(--radius-sm); padding:10px; background:#ffffff }
+    .doc-id{ color: var(--muted); font-size:.85rem; margin-bottom:6px; word-break: break-all }
+    .doc-text{ color: var(--text) }
+
+    .pill{ padding: 6px 10px; border-radius:999px; background: #edf3ff; border:1px solid #d8e2ec; font-size:.85rem }
+
+    .error{ background: #ffecec; border:1px solid #ffb3b3; color:#a30000; padding:10px 12px; border-radius: var(--radius-sm); }
+
+    .spinner{ width:18px; height:18px; border:3px solid rgba(117,168,211,.25); border-top-color: var(--panel-2); border-radius:50%; animation: spin .8s linear infinite }
+    @keyframes spin{ to{ transform: rotate(360deg) } }
+
+    .kbd{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:.85rem; background:#f0f4f9; padding:2px 6px; border-radius:6px; border:1px solid #d8e2ec }
+
+    .footer-note{ color: var(--muted); font-size:.85rem; margin-top: 12px }
+
+    .badge{ display:inline-block; padding:4px 10px; border-radius:999px; background:#eef6ff; border:1px solid #d8e2ec; color: var(--text); font-size:.85rem }
+
+    a:hover{
+      opacity: 50%;
+    }
+  </style>
+</head>
+<body>
+
+   <!-- Top Bar -->
+  <header class="topbar">
+    <div class="topbar__inner shell">   <!-- was .container -->
+      <a href="http://60.250.53.29:8004/" class="brand-link">
+        <img class="brand" src="/static/logo.png" alt="LKMXAI Logo" />
+      </a>
+      <h1 class="title">MTS LKMXAI Knowledge Graph Precision Reasoner</h1>
+      <a class="lang" href="#" title="Change language">
+        <img src="/static/globe.svg" alt="Language" />
+      </a>
+    </div>
+  </header>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar__inner shell">   <!-- was .container -->
+      <ul class="navbar__list">
+        <li class="navbar__item">
+          <a href="http://60.250.53.29:8005/" class="navbar__link">Knowledge Mapping</a>
+        </li>
+        <li class="navbar__item">
+          <a href="http://60.250.53.29:8003/" class="navbar__link">Knowledge Unifier</a>
+        </li>
+        <li class="navbar__item">
+          <a href="http://60.250.53.29:8500/" class="navbar__link active">Knowledge Well</a>
+        </li>
+        <li class="navbar__item">
+          <a href="http://60.250.53.30:7200/graphs" class="navbar__link">Knowledge Base</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="app-title">
+      <img class="logo" />
+      <div>
+        <h1>MTS Knowledge Well</h1>
+        <div class="muted">
+          Find information from specific domain knowledge-base
+        </div>
+      </div>
+    </div>
+
+    <!-- Query Card -->
+    <div class="card" id="query-card">
+      <div class="footer-note" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+        <!-- <span class="badge" id="api-badge">API: http://localhost:8000/chat</span>
+        <span class="badge">Timeout: 120 s</span> -->
+        <span class="muted"></span>
+      </div>
+
+      <div class="section">
+        <label for="question">Input question</label>
+        <textarea id="question" class="textarea" placeholder="e.g., Find hybrid bonding challenges in advanced packaging and proposed solutions…"></textarea>
+      </div>
+
+      <div class="toolbar">
+        <div class="muted">Press <span class="kbd">Ctrl</span>+<span class="kbd">Enter</span> to send</div>
+        <div>
+          <button class="btn" id="send-btn"><span id="send-icon">➤</span><span>Ask</span></button>
+          <button class="btn btn-secondary" id="clear-btn" title="Clear input">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result Card -->
+    <div class="card section" id="result-card" aria-live="polite">
+      <div id="status" class="muted">No query yet.</div>
+      <div id="error" class="error" style="display:none"></div>
+      <div id="result" style="display:none">
+        <div class="section">
+          <h3>Answer</h3>
+          <div id="answer" class="answer"></div>
+          <div class="section" style="display:flex; align-items:center; gap:8px">
+            <span class="pill" id="time-pill" title="Server response time">—</span>
+            <button class="btn btn-secondary" id="copy-answer">Copy answer</button>
+            <button class="btn btn-secondary" id="toggle-raw">Show raw JSON</button>
+          </div>
+        </div>
+
+        <div class="section" id="terms-section" style="display:none">
+          <h3>Extracted terms</h3>
+          <div class="tags" id="terms"></div>
+        </div>
+
+        <div class="section" id="context-section" style="display:none">
+          <h3>Context used</h3>
+          <div class="docs-grid" id="docs"></div>
+        </div>
+
+        <div class="section" id="graph-section" style="display:none">
+          <h3>Graph summary</h3>
+          <div class="answer" id="graph"></div>
+        </div>
+
+        <div class="section">
+          <details id="debug-details">
+            <summary>Debug</summary>
+            <div class="content">
+              <pre id="raw" style="white-space:pre-wrap"></pre>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === Hardcoded config ===
+    const API_BASE = 'http://60.250.53.29:8500';
+    const TIMEOUT_S = 300;
+
+    const qs = sel => document.querySelector(sel);
+    const questionEl = qs('#question');
+    const sendBtn = qs('#send-btn');
+    const clearBtn = qs('#clear-btn');
+
+    const statusEl = qs('#status');
+    const errorEl = qs('#error');
+    const resultWrap = qs('#result');
+    const answerEl = qs('#answer');
+    const timePill = qs('#time-pill');
+
+    const termsSection = qs('#terms-section');
+    const termsEl = qs('#terms');
+
+    const contextSection = qs('#context-section');
+    const docsGrid = qs('#docs');
+
+    const graphSection = qs('#graph-section');
+    const graphEl = qs('#graph');
+
+    const rawEl = qs('#raw');
+    const toggleRawBtn = qs('#toggle-raw');
+    const copyAnswerBtn = qs('#copy-answer');
+
+    // Helpers
+    function htmlEscape(s){
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+    }
+
+
+    function renderChips(container, items){
+      container.innerHTML = '';
+      (items || []).forEach((t, i) => {
+        const chip = document.createElement('span');
+        chip.className = 'tag' + (i % 2 ? ' alt' : '');
+        chip.textContent = t;
+        container.appendChild(chip);
+      });
+    }
+
+    function renderDocs(container, docs){
+      container.innerHTML = '';
+      (docs || []).slice(0, 8).forEach((text, idx) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'doc';
+        const id = document.createElement('div'); id.className = 'doc-id'; id.textContent = 'Doc #' + (idx+1);
+        const body = document.createElement('div'); body.className = 'doc-text'; body.textContent = text;
+        wrap.appendChild(id); wrap.appendChild(body); container.appendChild(wrap);
+      });
+    }
+
+    
+    function normalizeData(data){
+      const answer = data?.answer ?? data?.message ?? (typeof data === 'string' ? data : '');
+      const dp = data?.graph_debug?.rewriter_debug?.domain_phrases ?? [];
+      const kw = data?.graph_debug?.rewriter_debug?.keywords ?? [];
+      const terms_used = data?.graph_debug?.terms_used ?? Array.from(new Set([...(dp||[]), ...(kw||[])]));
+
+      let docs = [];
+      const vdocs = data?.context_used?.vector?.documents;
+      if (Array.isArray(vdocs)){
+        docs = Array.isArray(vdocs[0]) ? vdocs[0] : vdocs;
+      }
+
+      const graph = data?.context_used?.graph ?? '';
+      return {answer, terms_used, docs, graph};
+    }
+
+    function showLoading(){
+      errorEl.style.display = 'none';
+      resultWrap.style.display = 'none';
+      statusEl.innerHTML = '<span class="spinner" aria-hidden="true"></span> Fetching…';
+    }
+
+    function showError(msg){
+      statusEl.textContent = '';
+      errorEl.style.display = 'block';
+      errorEl.textContent = msg;
+      resultWrap.style.display = 'none';
+    }
+
+    function showResult(){
+      errorEl.style.display = 'none';
+      statusEl.textContent = '';
+      resultWrap.style.display = 'block';
+    }
+
+
+    async function ask(){
+      const url = API_BASE + '/chat';
+      const q = questionEl.value.trim();
+      if (!q) { questionEl.focus(); return; }
+
+      showLoading();
+      sendBtn.disabled = true; qs('#send-icon').textContent = '';
+
+      const started = performance.now();
+      try{
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), TIMEOUT_S * 1000);
+
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: q }),
+          signal: ctrl.signal,
+          mode: 'cors',
+        });
+        clearTimeout(timer);
+
+        const ms = Math.max(1, Math.round(performance.now() - started));
+        timePill.textContent = ms + ' ms';
+
+        const ct = (resp.headers.get('content-type') || '').toLowerCase();
+        let data;
+        if (ct.includes('application/json')){
+          data = await resp.json();
+        } else {
+          const txt = await resp.text();
+          try { data = JSON.parse(txt); } catch { data = { answer: txt }; }
+        }
+
+        if (!resp.ok){
+          const msg = data?.detail || data?.error || ('HTTP ' + resp.status);
+          showError(msg);
+          return;
+        }
+
+        // Parse the payload to our normalized shape
+        const norm = normalizeData(data);
+
+        // Pick the right renderer based on llm_meta
+        const R = window.getRendererFor?.(data?.llm_meta);
+
+        // Render the answer (safe fallback to plain text)
+        const rawAns = (norm.answer || data?.answer || data?.message || '').trim();
+        answerEl.innerHTML = '';
+        answerEl.appendChild((R?.renderAnswer ?? ((s)=>{const p=document.createElement('p'); p.textContent=String(s||''); return p;}))(rawAns));
+
+        if ((norm.terms_used || []).length){
+          renderChips(termsEl, norm.terms_used);
+          termsSection.style.display = '';
+        } else { termsSection.style.display = 'none'; }
+
+        if ((norm.docs || []).length){
+          renderDocs(docsGrid, norm.docs);
+          contextSection.style.display = '';
+        } else { contextSection.style.display = 'none'; }
+
+        graphEl.innerHTML = '';
+        if ((norm.graph || '').trim()) {
+          graphEl.appendChild((R?.renderGraphSummary ?? ((s)=>{const p=document.createElement('p'); p.textContent=String(s||''); return p;}))(norm.graph));
+          graphSection.style.display = '';
+        } else { graphSection.style.display = 'none'; }
+
+
+        rawEl.textContent = JSON.stringify(data, null, 2);
+        showResult();
+
+      } catch(err){
+        if (err?.name === 'AbortError') showError(`Request timed out (${TIMEOUT_S}s).`);
+        else showError(err?.message || 'Request failed');
+      } finally {
+        sendBtn.disabled = false; qs('#send-icon').textContent = '➤';
+      }
+    }
+
+    // Events
+    sendBtn.addEventListener('click', ask);
+    clearBtn.addEventListener('click', () => { questionEl.value=''; questionEl.focus(); });
+    questionEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)){
+        e.preventDefault(); ask();
+      }
+    });
+
+    toggleRawBtn.addEventListener('click', () => {
+      const d = document.querySelector('#debug-details');
+      d.open = !d.open;
+      toggleRawBtn.textContent = d.open ? 'Hide raw JSON' : 'Show raw JSON';
+    });
+
+    copyAnswerBtn.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(answerEl.textContent); copyAnswerBtn.textContent = 'Copied!'; }
+      catch { copyAnswerBtn.textContent = 'Copy failed'; }
+      finally { setTimeout(() => copyAnswerBtn.textContent = 'Copy answer', 1200); }
+    });
+
+    // Update the API badge text to reflect the constant
+    const badge = document.getElementById('api-badge');
+    if (badge) badge.textContent = 'API: ' + API_BASE + '/chat';
+  </script>
+
+  <script src="./js/renderer_gpt.js"></script>
+  <script src="./js/renderer_gemini.js"></script>
+</body>
+</html>

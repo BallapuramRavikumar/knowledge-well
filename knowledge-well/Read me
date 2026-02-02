@@ -1,0 +1,17 @@
+Python -m Venv venv- Create Venv
+
+.venv\Scripts\Activate- Activate Venv
+
+pip install -r requirements.txt- Install requirements
+
+rmdir /s /q .venv- Delete venv
+
+Remove-Item -Recurse -Force .venv
+
+uvicorn app.main:app --reload - start Server
+
+Refference Requirements
+
+certifi-2025.8.3
+attrs-
+cachetools-6.2.0
